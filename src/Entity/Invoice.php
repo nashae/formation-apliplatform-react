@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *  },
  *  itemOperations={"GET", "PUT", "DELETE", "increment"={"method"="post", "path"="/invoices/{id}/increment", "controller"="App\Controller\InvoiceIncrementationController", "swagger_context"={"summary"="incremente une facture", "description"="incremente le chrono d'une facture"}}},
  *  attributes={
- *      "pagination_enabled"=true,
+ *      "pagination_enabled"=false,
  *      "pagination_items_per_page"=20,
  *      "order": {"sentAt":"desc"}
  *  },
