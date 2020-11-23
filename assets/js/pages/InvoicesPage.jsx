@@ -1,27 +1,27 @@
 import moment from "moment";
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import Pagination from "../components/Pagination";
 import InvoicesAPI from "../services/InvoicesAPI";
 
 const STATUS_CLASSES = {
     PAID: "success",
     SENT: "primary",
-    CANCELLED: "danger"
-}
+    CANCELLED: "danger",
+};
 
 const STATUS_LABELS = {
     PAID: "Payée",
     SENT: "Envoyée",
-    CANCELLED: "Annulée"
-}
+    CANCELLED: "Annulée",
+};
 
 const InvoicesPage = (props) => {
-    
     const [invoices, setInvoices] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [search, setSearch] = useState("");
-    
-    const formatDate = (str) => moment(str).format('DD/MM/YYYY');
+
+    const formatDate = (str) => moment(str).format("DD/MM/YYYY");
     const itemsPerPage = 10;
 
     //recuperation des invoices via invoicesAPI
@@ -29,17 +29,16 @@ const InvoicesPage = (props) => {
         try {
             const data = await InvoicesAPI.findAll();
             setInvoices(data);
-        setInvoices(data)
+            setInvoices(data);
         } catch (error) {
             console.log(error.response);
         }
-    }
+    };
 
     //charger les invoices au chargement du composant
     useEffect(() => {
         fetchInvoices();
     }, []);
-
 
     //gestion du changement de page
     const handlePageChange = (page) => {
@@ -53,24 +52,25 @@ const InvoicesPage = (props) => {
     };
 
     //gestion suppression
-    const handleDelete = async id => {
+    const handleDelete = async (id) => {
         const originalInvoices = [...invoices];
-        setInvoices(invoices.filter(invoice => invoice.id !== id));
-        try{
-            await InvoicesAPI.delete(id)
-        } catch (error){
+        setInvoices(invoices.filter((invoice) => invoice.id !== id));
+        try {
+            await InvoicesAPI.delete(id);
+        } catch (error) {
             console.log(error.response);
             setInvoices(originalInvoices);
         }
-    }
+    };
 
-    
     //filtrage des invoices en fonction de la recherche
     const filteredInvoices = invoices.filter(
         (i) =>
             i.customer.firstName.toLowerCase().includes(search.toLowerCase()) ||
             i.customer.lastName.toLowerCase().includes(search.toLowerCase()) ||
-            STATUS_LABELS[i.status].toLowerCase().includes(search.toLowerCase()) ||
+            STATUS_LABELS[i.status]
+                .toLowerCase()
+                .includes(search.toLowerCase()) ||
             i.amount.toString().startsWith(search.toLowerCase())
     );
 
@@ -81,10 +81,14 @@ const InvoicesPage = (props) => {
         itemsPerPage
     );
 
-
-    return ( 
+    return (
         <>
-            <h1>liste des factures</h1>
+            <div className="d-flex justify-content-between align-items-center">
+                <h1>Liste des factures</h1>
+                <Link className="btn btn-primary" to="/invoices/new">
+                    Créer une facture
+                </Link>
+            </div>
 
             <div className="form-group">
                 <input
@@ -99,31 +103,65 @@ const InvoicesPage = (props) => {
             <table className="table table-hover">
                 <thead>
                     <tr>
-                    <th>Numero</th>
-                    <th>Client</th>
-                    <th className="text-center">date d'envoi</th>
-                    <th className="text-center">Statut</th>
-                    <th className="text-center">Montant</th>
-                    <th></th>
+                        <th>Numero</th>
+                        <th>Client</th>
+                        <th className="text-center">date d'envoi</th>
+                        <th className="text-center">Statut</th>
+                        <th className="text-center">Montant</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
-                    {paginatedInvoices.map(invoice => <tr key={invoice.id}>
-                        <td>{invoice.chrono}</td>
-                        <td><a href="#">{invoice.customer.firstName} {invoice.customer.lastName}</a></td>
-                        <td className="text-center">{formatDate(invoice.sentAt)}</td>
-                        <td className="text-center"><span className={"badge badge-" + STATUS_CLASSES[invoice.status]}>{STATUS_LABELS[invoice.status]}</span></td>
-                        <td className="text-center">{invoice.amount.toLocaleString()} €</td>
-                        <td>
-                            <button className="btn btn-sm btn-primary">Editer</button>
-                            <button className="btn btn-sm btn-danger ml-1" onClick={() => handleDelete(invoice.id)}>Supprimer</button>
-                        </td>
-                    </tr>)}
+                    {paginatedInvoices.map((invoice) => (
+                        <tr key={invoice.id}>
+                            <td>{invoice.chrono}</td>
+                            <td>
+                                <a href="#">
+                                    {invoice.customer.firstName}{" "}
+                                    {invoice.customer.lastName}
+                                </a>
+                            </td>
+                            <td className="text-center">
+                                {formatDate(invoice.sentAt)}
+                            </td>
+                            <td className="text-center">
+                                <span
+                                    className={
+                                        "badge badge-" +
+                                        STATUS_CLASSES[invoice.status]
+                                    }
+                                >
+                                    {STATUS_LABELS[invoice.status]}
+                                </span>
+                            </td>
+                            <td className="text-center">
+                                {invoice.amount.toLocaleString()} €
+                            </td>
+                            <td>
+                                <Link to={"/invoices/" + invoice.id} className="btn btn-sm btn-primary">
+                                    Editer
+                                </Link>
+                                <button
+                                    className="btn btn-sm btn-danger ml-1"
+                                    onClick={() => handleDelete(invoice.id)}
+                                >
+                                    Supprimer
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
                 </tbody>
             </table>
-            {<Pagination currentPage={currentPage} itemsPerPage={itemsPerPage} onPageChanged={handlePageChange} length={filteredInvoices.length} />}
+            {
+                <Pagination
+                    currentPage={currentPage}
+                    itemsPerPage={itemsPerPage}
+                    onPageChanged={handlePageChange}
+                    length={filteredInvoices.length}
+                />
+            }
         </>
-     );
-}
- 
+    );
+};
+
 export default InvoicesPage;

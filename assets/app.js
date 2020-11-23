@@ -26,6 +26,9 @@ import PrivateRoute from "./js/components/PrivateRoute"
 
 // any CSS you import will output into a single css file (app.css in this case)
 import "./styles/app.css";
+import CustomerProfilPage from "./js/pages/CustomerProfilPage";
+import InvoicePage from "./js/pages/InvoicePage";
+import RegisterPage from "./js/pages/RegisterPage";
 
 AuthAPI.setup();
 
@@ -50,9 +53,15 @@ const App = () => {
                 <main className="container pt-5">
                     <Switch>
                         <Route path="/login" component={LoginPage} />
+                        <Route path="/register" component={RegisterPage}/>
+                        <PrivateRoute path="/customers/:id" component={CustomerProfilPage}/>
                         <PrivateRoute
                             path="/customers"
                             component={CustomersPage}
+                        />
+                        <PrivateRoute
+                            path="/invoices/:id"
+                            component={InvoicePage}
                         />
                         <PrivateRoute
                             path="/invoices"
