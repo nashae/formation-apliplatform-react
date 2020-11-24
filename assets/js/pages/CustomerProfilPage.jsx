@@ -3,6 +3,8 @@ import Field from "../components/forms/field";
 import { Link } from "react-router-dom";
 import Axios from "axios";
 import CustomersAPI from "../services/CustomersAPI";
+import { toast } from "react-toastify";
+import FormContentLoader from "../components/loaders/FormContentLoader";
 
 const CustomerProfilPage = ({match, history}) => {
 
@@ -23,14 +25,16 @@ const CustomerProfilPage = ({match, history}) => {
     });
 
     const [editing, setEditing] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     //recuperation du customer en fonction de l'identifiant
     const fetchCustomer = async (id) => {
         try {
             const { firstName, lastName, email, company } = await CustomersAPI.find(id)
             setCustomer({ firstName, lastName, email, company });
+            setLoading(false);
         } catch (error) {
-            console.log(error.response);
+            toast.error("Le client n'a pas pu être récuperé");      
             history.replace("/customers");
         }
     };
@@ -38,6 +42,7 @@ const CustomerProfilPage = ({match, history}) => {
     //chargement du customer si besoin au chargement du composant ou au changement de l'identifiant
     useEffect(() => {
         if (id !== "new") {
+            setLoading(true);
             setEditing(true);
             fetchCustomer(id);
         }
@@ -53,13 +58,15 @@ const CustomerProfilPage = ({match, history}) => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
+            setErrors({});
             if (editing) {
                 await CustomersAPI.update(id, customer);
+                toast.success(`Le client ${id} a bien été modifié 😎`)
             } else {
                 await CustomersAPI.create(customer);
+                toast.success(`Le client a bien été crée 😎`)
                 history.replace("/customers");
             }
-            setErrors({});
         } catch (error) {
             if (error.response.data.violations) {
                 const apiErrors = {};
@@ -67,6 +74,7 @@ const CustomerProfilPage = ({match, history}) => {
                     apiErrors[violation.propertyPath] = violation.message;
                 });
                 setErrors(apiErrors);
+                toast.error("Il y a des erreurs dans votre formulaire, merci de les corriger");
             }
         }
     };
@@ -76,7 +84,8 @@ const CustomerProfilPage = ({match, history}) => {
             {(!editing && <h1>Creation d'un client</h1>) || (
                 <h1>Modification du client</h1>
             )}
-            <form onSubmit={handleSubmit}>
+            {loading && <FormContentLoader/>}
+            {!loading && <form onSubmit={handleSubmit}>
                 <Field
                     name="lastName"
                     label="Nom de famille"
@@ -118,7 +127,7 @@ const CustomerProfilPage = ({match, history}) => {
                         Retour à la liste
                     </Link>
                 </div>
-            </form>
+            </form>}
         </>
     );
 };

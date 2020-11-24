@@ -1,6 +1,8 @@
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
+import TableLoader from "../components/loaders/TableLoader";
 import Pagination from "../components/Pagination";
 import InvoicesAPI from "../services/InvoicesAPI";
 
@@ -20,6 +22,7 @@ const InvoicesPage = (props) => {
     const [invoices, setInvoices] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [search, setSearch] = useState("");
+    const [loading, setLoading] = useState(true)
 
     const formatDate = (str) => moment(str).format("DD/MM/YYYY");
     const itemsPerPage = 10;
@@ -29,9 +32,9 @@ const InvoicesPage = (props) => {
         try {
             const data = await InvoicesAPI.findAll();
             setInvoices(data);
-            setInvoices(data);
+            setLoading(false);
         } catch (error) {
-            console.log(error.response);
+            toast.error("Erreur lors du chargement des factures");
         }
     };
 
@@ -57,8 +60,9 @@ const InvoicesPage = (props) => {
         setInvoices(invoices.filter((invoice) => invoice.id !== id));
         try {
             await InvoicesAPI.delete(id);
+            toast.success(`La facture n°${id} a bien été supprimée`);
         } catch (error) {
-            console.log(error.response);
+            toast.error("Une erreur est survenue")
             setInvoices(originalInvoices);
         }
     };
@@ -116,10 +120,10 @@ const InvoicesPage = (props) => {
                         <tr key={invoice.id}>
                             <td>{invoice.chrono}</td>
                             <td>
-                                <a href="#">
+                                <Link to={"/customers/" + invoice.customer.id}>
                                     {invoice.customer.firstName}{" "}
                                     {invoice.customer.lastName}
-                                </a>
+                                </Link>
                             </td>
                             <td className="text-center">
                                 {formatDate(invoice.sentAt)}
@@ -152,6 +156,7 @@ const InvoicesPage = (props) => {
                     ))}
                 </tbody>
             </table>
+            {loading && <TableLoader/>}
             {
                 <Pagination
                     currentPage={currentPage}

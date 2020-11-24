@@ -1,6 +1,7 @@
 import Axios from "axios";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 import Field from "../components/forms/field";
 import UsersAPI from "../services/UsersAPI";
 
@@ -34,11 +35,13 @@ const RegisterPage = ({history}) => {
         if(user.password !== user.passwordConfirm){
             apiErrors.passwordConfirm = "Les mots de passe doivent etre identiques";
             setErrors(apiErrors);
+            toast.error("Il y a des erreurs dans votre formulaire, corrigez-les pour valider votre inscription");
             return;
         }
         try {
             await UsersAPI.register(user);
             setErrors({});
+            toast.success("Inscription effectuée, vous pouvez vous connecter 😎");
             history.replace('/login');
         } catch (error){
             console.log(error.response);
@@ -49,8 +52,8 @@ const RegisterPage = ({history}) => {
                 });
                 setErrors(apiErrors);
             }
+            toast.error("Il y a des erreurs dans votre formulaire, corrigez-les pour valider votre inscription");
         }
-        console.log(user);
     };
 
     return (

@@ -1,4 +1,5 @@
 import React, { useContext, useState } from "react";
+import { toast } from "react-toastify";
 import Field from "../components/forms/field";
 import AuthContext from "../contexts/AuthContext";
 import AuthAPI from "../services/AuthAPI";
@@ -26,12 +27,14 @@ const LoginPage = ({ onLogin, history }) => {
             await AuthAPI.authenticate(credentials);
             setError("");
             setIsAuthenticated(true);
+            toast.success("Vous êtes désormais connecté 😊")
             history.replace("/customers");
         } catch (error) {
             console.log(error.response);
             setError(
                 "aucun compte ne possede ce mail ou les informations ne correspondent pas"
             );
+            toast.error("Une erreur est survenue");
         }
     };
 

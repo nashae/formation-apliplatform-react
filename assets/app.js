@@ -16,6 +16,10 @@ import LoginPage from "./js/pages/LoginPage";
 import AuthAPI from "./js/services/AuthAPI";
 import AuthContext from "./js/contexts/AuthContext";
 import PrivateRoute from "./js/components/PrivateRoute"
+import CustomerProfilPage from "./js/pages/CustomerProfilPage";
+import InvoicePage from "./js/pages/InvoicePage";
+import RegisterPage from "./js/pages/RegisterPage";
+import { toast, ToastContainer } from "react-toastify";
 
 /*
  * Welcome to your app's main JavaScript file!
@@ -26,9 +30,8 @@ import PrivateRoute from "./js/components/PrivateRoute"
 
 // any CSS you import will output into a single css file (app.css in this case)
 import "./styles/app.css";
-import CustomerProfilPage from "./js/pages/CustomerProfilPage";
-import InvoicePage from "./js/pages/InvoicePage";
-import RegisterPage from "./js/pages/RegisterPage";
+import 'react-toastify/dist/ReactToastify.css'
+
 
 AuthAPI.setup();
 
@@ -71,6 +74,7 @@ const App = () => {
                     </Switch>
                 </main>
             </HashRouter>
+            <ToastContainer position={toast.POSITION.BOTTOM_RIGHT}/>
         </AuthContext.Provider>
     );
 };
